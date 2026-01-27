@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ###
 
-GET {{HotelListing.Api_HostAddress}}/api/hotels/2
+GET {{HotelListing.Api_HostAddress}}/api/hotels
 
 ###
 
@@ -34,3 +34,136 @@ Content-Type: application/json
   "address": "123 Main St",
   "rating" : 4.5
 }
+
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/countries
+#X-Api-Key: dXNlckBleGFtcGxlLmNvbTpQYSQkdzByZDEyMzQ=
+#Authorization: Basic dXNlckBleGFtcGxlLmNvbTpQYSQkdzByZDEyMzQ=
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmYwZmRmOC0yMDE4LTQwODAtOGYxNS03Njc3ODZmMTc1YTkiLCJlbWFpbCI6InVzZXIxQGxvY2FsaG9zdC5jb20iLCJqdGkiOiIyZTA2NDk1Zi1jYjg2LTQ0M2YtOTkyOS1lMjdlMjFmZjk1MzgiLCJuYW1lIjoiTGFzdCwgRmlyc3QiLCJleHAiOjE3Njk1NDgzNDksImlzcyI6IkhvdGVsTGlzdGluZ0FQSSIsImF1ZCI6IkhvdGVsTGlzdGluZ0FQSUNsaWVudCJ9.PuZ8B-1uAoYSBDNoManOr1MZ3EUkThZUtv6SxbOzEBY
+###
+
+DELETE {{HotelListing.Api_HostAddress}}/api/countries/2
+
+###
+
+@id=2
+PUT {{HotelListing.Api_HostAddress}}/api/countries/2
+Content-Type: application/json
+
+{
+  "countryId" : 2,
+  "name" : "Jamaica",
+  "shortName" : "JM"
+}
+
+###
+
+###
+
+@id=1
+GET {{HotelListing.Api_HostAddress}}/api/countries/1
+
+###
+
+POST {{HotelListing.Api_HostAddress}}/api/countries
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmYwZmRmOC0yMDE4LTQwODAtOGYxNS03Njc3ODZmMTc1YTkiLCJlbWFpbCI6InVzZXIxQGxvY2FsaG9zdC5jb20iLCJqdGkiOiIyZTA2NDk1Zi1jYjg2LTQ0M2YtOTkyOS1lMjdlMjFmZjk1MzgiLCJuYW1lIjoiTGFzdCwgRmlyc3QiLCJleHAiOjE3Njk1NDgzNDksImlzcyI6IkhvdGVsTGlzdGluZ0FQSSIsImF1ZCI6IkhvdGVsTGlzdGluZ0FQSUNsaWVudCJ9.PuZ8B-1uAoYSBDNoManOr1MZ3EUkThZUtv6SxbOzEBY
+
+Content-Type: application/json
+
+{
+    "name" : "Test Country",
+    "shortName": "TC"
+}
+
+###
+
+
+GET {{HotelListing.Api_HostAddress}}/api/hotels
+
+###
+
+POST {{HotelListing.Api_HostAddress}}/api/hotels
+Content-Type: application/json
+
+{
+    "name": "Test Hotel Plaza",
+    "address": "123 Main St",
+    "rating" : 4.5,
+    "countryid" : 1
+}
+
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/hotels/7
+
+###
+
+DELETE {{HotelListing.Api_HostAddress}}/api/hotels/6
+
+###
+
+PUT {{HotelListing.Api_HostAddress}}/api/hotels/6
+Content-Type: application/json
+
+{
+  "Id": 1,
+  "Name" : "Ocean Coral",
+  "Address" : "Trelawny, Jamaica",
+  "Rating" : 4.5,
+  "CountryId" : 1
+}
+
+###
+
+POST {{HotelListing.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+{
+  "email": "user1@localhost.com",
+  "password": "P@ssword1",
+  "firstName":"First",
+  "lastName": "Last"
+}
+
+
+###
+POST {{HotelListing.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@localhost.com",
+  "password": "P@ssword1"
+}
+
+###
+POST {{HotelListing.Api_HostAddress}}/api/defaultauth/login
+Content-Type: application/json
+
+{
+  "email": "admin6@localhost.com",
+  "password": "P@ssword1"
+}
+
+###
+
+POST {{HotelListing.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user7@localhost.com",
+  "password": "P@ssword1",
+  "firstName":"First",
+  "lastName": "Last"
+}
+
+###
+@apiKey=dXNlckBleGFtcGxlLmNvbTpQYSQkdzByZDEyMzQ=
+GET {{HotelListing.Api_HostAddress}}/api/apikey
+X-Api-Key: {{apiKey}}
+
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/basicauth
+Authorization: Basic dXNlcjFAbG9jYWxob3N0LmNvbTpQQHNzd29yZDE=
+
+###
