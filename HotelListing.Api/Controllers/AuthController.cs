@@ -1,11 +1,11 @@
-﻿using HotelListing.Api.Contracts;
-using HotelListing.Api.DTOs.Auth;
-using HotelListing.Api.Results;
+﻿using HotelListing.Api.Common.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using HotelListing.Api.Application.DTOs.Auth;
+using HotelListing.Api.Application.Contracts;
 
 namespace HotelListing.Api.Controllers
 {

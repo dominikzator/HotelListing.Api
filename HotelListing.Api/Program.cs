@@ -1,10 +1,10 @@
-using HotelListing.Api;
+using HotelListing.Api.Application.Contracts;
+using HotelListing.Api.Application.MappingProfiles;
+using HotelListing.Api.Application.Services;
 using HotelListing.Api.Common.Constants;
 using HotelListing.Api.Common.Models;
-using HotelListing.Api.Contracts;
+using HotelListing.Api.Domain;
 using HotelListing.Api.Handlers;
-using HotelListing.Api.MappingProfiles;
-using HotelListing.Api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -49,7 +49,7 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[jwtSettings.Key])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
             ClockSkew = TimeSpan.Zero
         };
     })
@@ -64,7 +64,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 
-builder.Services.AddAutoMapper(config => { }, Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(config => { }, typeof(HotelMappingProfile).Assembly);
 /*builder.Services.AddAutoMapper(config =>
 {
     config.AddProfile<HotelMappingProfile>();

@@ -4,13 +4,12 @@
 @hotelId=7
 @bookingId=8
 @today={{$localDatetime iso8601}} 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWNkODgyOS1jZmY2LTQ3YWYtODU1Zi05ZDk3ZGI2OGU1OGUiLCJlbWFpbCI6ImhvdGVsYWRtaW40QGxvY2FsaG9zdC5jb20iLCJqdGkiOiI2ZjhhNjkzYi1mYzZiLTQ5NGYtYTBhMS0yYmE5M2Q4MzZkZGMiLCJuYW1lIjoiQWRtaW4sIEhvdGVsIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiSG90ZWwgQWRtaW4iLCJleHAiOjE3Njk2OTAxOTgsImlzcyI6IkhvdGVsTGlzdGluZ0FQSSIsImF1ZCI6IkhvdGVsTGlzdGluZ0FQSUNsaWVudCJ9.xuKRzCOTDnCH0uRJlsGsK5zj9D8CQb93WVFpjfDh-Xw
-###
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZWYzNGUxYy02M2QyLTRiYTItOTc5Mi0zNGEzZWI4ZTYzOGUiLCJlbWFpbCI6ImFkbWluaXN0cmF0b3JAbG9jYWxob3N0LmNvbSIsImp0aSI6ImU1ZThhOWM1LTcyOWUtNGE0My1iZGZlLThiN2QzYmY0Zjc1NCIsIm5hbWUiOiJBZG1pbiwgTWFzdGVyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW5pc3RyYXRvciIsImV4cCI6MTc2OTcxMDIwMiwiaXNzIjoiSG90ZWxMaXN0aW5nQVBJIiwiYXVkIjoiSG90ZWxMaXN0aW5nQVBJQ2xpZW50In0.H3d8bpMA872K-Qz2oHi26n11_8W-cgxnlaYszIPKOUc
 POST {{host}}/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "hoteladmin4@localhost.com",
+  "email": "hoteladmin5@localhost.com",
   "password": "P@ssword1",
   "firstName":"Hotel",
   "lastName": "Admin",

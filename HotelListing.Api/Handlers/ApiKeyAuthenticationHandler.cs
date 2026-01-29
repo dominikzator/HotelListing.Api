@@ -1,6 +1,5 @@
-﻿using HotelListing.Api.Common.Constants;
-using HotelListing.Api.Contracts;
-using HotelListing.Api.DTOs.Auth;
+﻿using HotelListing.Api.Application.Contracts;
+using HotelListing.Api.Common.Constants;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
