@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,10 +23,13 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<HotelListingDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
     .AddJwtBearer(options =>
     {
@@ -49,13 +53,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 
-builder.Services.AddAutoMapper(config =>
+builder.Services.AddAutoMapper(config => { }, Assembly.GetExecutingAssembly());
+/*builder.Services.AddAutoMapper(config =>
 {
     config.AddProfile<HotelMappingProfile>();
     config.AddProfile<CountryMappingProfile>();
-});
+});*/
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

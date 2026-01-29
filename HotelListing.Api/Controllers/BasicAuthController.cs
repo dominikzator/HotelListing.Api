@@ -1,87 +1,45 @@
 ﻿using HotelListing.Api.Constants;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HotelListing.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = AuthenticationDefaults.BasicScheme)]
-public class BasicAuthController : Controller
+public class BasicAuthController : ControllerBase
 {
-    // GET: ApiKeyController
-    public ActionResult Index()
+    // GET: api/<ApiKeyController>
+    [HttpGet]
+    public IEnumerable<string> Get()
     {
-        return View();
+        return new string[] { "value1", "value2" };
     }
 
-    // GET: ApiKeyController/Details/5
-    public ActionResult Details(int id)
+    // GET api/<ApiKeyController>/5
+    [HttpGet("{id}")]
+    public string Get(int id)
     {
-        return View();
+        return "value";
     }
 
-    // GET: ApiKeyController/Create
-    public ActionResult Create()
-    {
-        return View();
-    }
-
-    // POST: ApiKeyController/Create
+    // POST api/<ApiKeyController>
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Create(IFormCollection collection)
+    public void Post([FromBody] string value)
     {
-        try
-        {
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
     }
 
-    // GET: ApiKeyController/Edit/5
-    public ActionResult Edit(int id)
+    // PUT api/<ApiKeyController>/5
+    [HttpPut("{id}")]
+    public void Put(int id, [FromBody] string value)
     {
-        return View();
     }
 
-    // POST: ApiKeyController/Edit/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Edit(int id, IFormCollection collection)
+    // DELETE api/<ApiKeyController>/5
+    [HttpDelete("{id}")]
+    public void Delete(int id)
     {
-        try
-        {
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
-    }
-
-    // GET: ApiKeyController/Delete/5
-    public ActionResult Delete(int id)
-    {
-        return View();
-    }
-
-    // POST: ApiKeyController/Delete/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id, IFormCollection collection)
-    {
-        try
-        {
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
     }
 }

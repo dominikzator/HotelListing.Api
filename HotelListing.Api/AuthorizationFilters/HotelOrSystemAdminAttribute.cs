@@ -1,0 +1,61 @@
+﻿using HotelListing.Api.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+namespace HotelListing.Api.AuthorizationFilters;
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+public sealed class HotelOrSystemAdminAttribute : TypeFilterAttribute
+{
+    public HotelOrSystemAdminAttribute() : base(typeof(HotelOrSystemAdminFilter))
+    {
+        
+    }
+}
+
+public class HotelOrSystemAdminFilter(IServiceProvider serviceProvider) : IAsyncAuthorizationFilter
+{
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    {
+        var httpUser = context.HttpContext.User;
+        if (httpUser?.Identity?.IsAuthenticated == false)
+        {
+            context.Result = new UnauthorizedResult();
+            return;
+        }
+
+        if (httpUser!.IsInRole("Administrator")) return;
+
+        var userId = httpUser.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
+                     httpUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            context.Result = new ForbidResult();
+            return;
+        }
+
+        // BEZPIECZNY dostęp do route data
+        if (!context.RouteData.Values.TryGetValue("hotelId", out var hotelIdObj) ||
+            !int.TryParse(hotelIdObj?.ToString(), out int hotelId) || hotelId == 0)
+        {
+            context.Result = new ForbidResult(new[] { "Invalid or missing hotelId" });
+            return;
+        }
+
+        var dbContext = context.HttpContext.RequestServices.GetRequiredService<HotelListingDbContext>();
+
+        var isHotelAdminUser = await dbContext.HotelAdmins
+            .AnyAsync(q => q.UserId == userId && q.HotelId == hotelId);
+
+        if (!isHotelAdminUser)
+        {
+            context.Result = new ForbidResult();
+            return;
+        }
+    }
+}
