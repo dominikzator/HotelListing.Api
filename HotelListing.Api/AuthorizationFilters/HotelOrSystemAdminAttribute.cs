@@ -1,4 +1,4 @@
-﻿using HotelListing.Api.Data;
+﻿using HotelListing.Api.Common.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ public class HotelOrSystemAdminFilter(IServiceProvider serviceProvider) : IAsync
             return;
         }
 
-        if (httpUser!.IsInRole("Administrator")) return;
+        if (httpUser!.IsInRole(RoleNames.Administrator)) return;
 
         var userId = httpUser.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ??
                      httpUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;

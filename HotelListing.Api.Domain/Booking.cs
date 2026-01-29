@@ -1,5 +1,5 @@
-﻿using HotelListing.Api.Data;
-using HotelListing.Api.Data.Enums;
+﻿using HotelListing.Api;
+using HotelListing.Api.Enums;
 
 public class Booking
 {

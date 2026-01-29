@@ -1,4 +1,4 @@
-﻿using HotelListing.Api.Data;
+﻿using HotelListing.Api;
 
 public class HotelAdmin
 {

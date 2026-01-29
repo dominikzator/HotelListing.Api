@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace HotelListing.Api.Data
+namespace HotelListing.Api
 {
     public class HotelListingDbContext : IdentityDbContext<ApplicationUser>
     {
         public HotelListingDbContext(DbContextOptions<HotelListingDbContext> options) : base(options)
         {
-            
+
         }
 
         public DbSet<Country> Countries { get; set; }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelListing.Api.Data.Configurations;
+namespace HotelListing.Api.Configurations;
 
 public class ApiKeyConfiguration : IEntityTypeConfiguration<ApiKey>
 {

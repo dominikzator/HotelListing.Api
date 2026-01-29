@@ -1,14 +1,14 @@
 ﻿using HotelListing.Api.Contracts;
-using HotelListing.Api.Data;
 using HotelListing.Api.DTOs.Booking;
 using HotelListing.Api.Results;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
-using HotelListing.Api.Data.Enums;
 using Humanizer;
 using HotelListing.Api.AuthorizationFilters;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using HotelListing.Api.Common.Constants;
+using HotelListing.Api.Enums;
 
 namespace HotelListing.Api.Services;
 

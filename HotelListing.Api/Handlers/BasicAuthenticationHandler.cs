@@ -1,5 +1,4 @@
 ﻿using HotelListing.Api.Contracts;
-using HotelListing.Api.Data;
 using HotelListing.Api.DTOs.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;

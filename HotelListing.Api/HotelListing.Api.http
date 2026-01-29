@@ -120,6 +120,7 @@ Content-Type: application/json
 
 POST {{HotelListing.Api_HostAddress}}/api/auth/register
 Content-Type: application/json
+
 {
   "email": "user1@localhost.com",
   "password": "P@ssword1",

@@ -1,8 +1,13 @@
-﻿using HotelListing.Api.Contracts;
-using HotelListing.Api.Data;
+﻿using HotelListing.Api.Common.Constants;
+using HotelListing.Api.Common.Models;
+using HotelListing.Api.Common.Constants;
+using HotelListing.Api.Contracts;
+
 using HotelListing.Api.DTOs.Auth;
 using HotelListing.Api.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,7 +16,7 @@ using System.Text;
 namespace HotelListing.Api.Services;
 
 public class UsersService(UserManager<ApplicationUser> userManager
-    , IConfiguration configuration
+    , IOptions<JwtSettings> jwtOptions
     , HotelListingDbContext hotelListingDbContext
     , IHttpContextAccessor httpContextAccessor) : IUsersService
 {
@@ -35,7 +40,7 @@ public class UsersService(UserManager<ApplicationUser> userManager
 
         await userManager.AddToRoleAsync(user, registerUserDto.Role);
 
-        if(registerUserDto.Role == "Hotel Admin")
+        if(registerUserDto.Role == RoleNames.HotelAdmin)
         {
             var hotelAdmin = hotelListingDbContext.HotelAdmins.Add(new HotelAdmin { 
                 UserId = user.Id,
@@ -104,15 +109,15 @@ public class UsersService(UserManager<ApplicationUser> userManager
         claims = claims.Union(roleClaims).ToList();
 
         // Set JWT Key credentials
-        var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
+        var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.Key));
         var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 
         //Create an encoded token
         var token = new JwtSecurityToken(
-            issuer: configuration["JwtSettings:Issuer"],
-            audience: configuration["JwtSettings:Audience"],
+            issuer: jwtOptions.Value.Issuer,
+            audience: jwtOptions.Value.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:DurationInMinutes"])),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(jwtOptions.Value.DurationInMinutes)),
             signingCredentials: credentials
             );
 

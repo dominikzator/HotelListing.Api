@@ -1,5 +1,4 @@
-﻿using HotelListing.Api.Constants;
-using HotelListing.Api.Contracts;
+﻿using HotelListing.Api.Contracts;
 using HotelListing.Api.DTOs.Country;
 using HotelListing.Api.Results;
 using HotelListing.Api.Services;
