@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelListing.Api.Common.Constants;
-using HotelListing.Api.Common.Constants;
 using HotelListing.Api.Common.Results;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using HotelListing.Api.Application.DTOs.Hotel;
 using HotelListing.Api.Application.Contracts;
 using HotelListing.Api.Domain;
+using HotelListing.Api.Common.Models.Paging;
+using HotelListing.Api.Common.Models.Extensions;
+using HotelListing.Api.Common.Models.Filtering;
 
 namespace HotelListing.Api.Application.Services;
 
@@ -15,13 +17,53 @@ public class HotelsService(HotelListingDbContext context,
     ICountriesService countriesService,
     IMapper mapper) : IHotelsService
 {
-    public async Task<Result<IEnumerable<GetHotelDto>>> GetHotelsAsync()
+    public async Task<Result<PagedResult<GetHotelDto>>> GetHotelsAsync(PaginationParameters paginationParameters, HotelFilterParameters filters)
     {
-        var hotels = await context.Hotels
-            .ProjectTo<GetHotelDto>(mapper.ConfigurationProvider)
-            .ToListAsync();
+        var query = context.Hotels.AsQueryable();
+        if(filters.CountryId.HasValue)
+        {
+            query = query.Where(p => p.CountryId == filters.CountryId);
+        }
+        if (filters.MinRating.HasValue)
+        {
+            query = query.Where(p => p.Rating >= filters.MinRating);
+        }
+        if (filters.MaxRating.HasValue)
+        {
+            query = query.Where(p => p.Rating <= filters.MaxRating);
+        }
+        if (filters.MinPrice.HasValue)
+        {
+            query = query.Where(p => p.PerNightRate >= filters.MinPrice);
+        }
+        if (filters.MaxPrice.HasValue)
+        {
+            query = query.Where(p => p.PerNightRate <= filters.MaxPrice);
+        }
+        if (!string.IsNullOrWhiteSpace(filters.Location))
+        {
+            query = query.Where(p => p.Address.Contains(filters.Location));
+        }
 
-        return Result<IEnumerable<GetHotelDto>>.Success(hotels);
+        if(!string.IsNullOrWhiteSpace(filters.Search))
+        {
+            query = query.Where(p => p.Name.Contains(filters.Search) || p.Address.Contains(filters.Search));
+        }
+
+        query = filters.SortBy?.ToLower() switch
+        {
+            "name" => (bool)filters.SortDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+            "rating" => (bool)filters.SortDescending ? query.OrderByDescending(p => p.Rating) : query.OrderBy(p => p.Rating),
+            "price" => (bool)filters.SortDescending ? query.OrderByDescending(p => p.PerNightRate) : query.OrderBy(p => p.PerNightRate),
+            _ => query.OrderBy(p => p.Name)
+        };
+
+        var hotels = await query
+            .Include(q => q.Country)
+            .ProjectTo<GetHotelDto>(mapper.ConfigurationProvider)
+            .ToPagedResultAsync(paginationParameters);
+
+        return Result<PagedResult<GetHotelDto>>.Success(hotels);
     }
 
     public async Task<Result<GetHotelDto>> GetHotelAsync(int id)

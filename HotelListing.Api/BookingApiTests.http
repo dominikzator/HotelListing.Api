@@ -4,7 +4,7 @@
 @hotelId=7
 @bookingId=8
 @today={{$localDatetime iso8601}} 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZWYzNGUxYy02M2QyLTRiYTItOTc5Mi0zNGEzZWI4ZTYzOGUiLCJlbWFpbCI6ImFkbWluaXN0cmF0b3JAbG9jYWxob3N0LmNvbSIsImp0aSI6ImU1ZThhOWM1LTcyOWUtNGE0My1iZGZlLThiN2QzYmY0Zjc1NCIsIm5hbWUiOiJBZG1pbiwgTWFzdGVyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW5pc3RyYXRvciIsImV4cCI6MTc2OTcxMDIwMiwiaXNzIjoiSG90ZWxMaXN0aW5nQVBJIiwiYXVkIjoiSG90ZWxMaXN0aW5nQVBJQ2xpZW50In0.H3d8bpMA872K-Qz2oHi26n11_8W-cgxnlaYszIPKOUc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZWYzNGUxYy02M2QyLTRiYTItOTc5Mi0zNGEzZWI4ZTYzOGUiLCJlbWFpbCI6ImFkbWluaXN0cmF0b3JAbG9jYWxob3N0LmNvbSIsImp0aSI6Ijg1ZmYxY2JlLTk2NmItNGQwNy05NGViLWE2M2JmZTcwYTFiMSIsIm5hbWUiOiJBZG1pbiwgTWFzdGVyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW5pc3RyYXRvciIsImV4cCI6MTc2OTc4MDc0MiwiaXNzIjoiSG90ZWxMaXN0aW5nQVBJIiwiYXVkIjoiSG90ZWxMaXN0aW5nQVBJQ2xpZW50In0.xoR-Zj9dzMG1eqgiWPe2vJcwdFJGPHn4ARovcS2s1A0
 POST {{host}}/api/auth/register
 Content-Type: application/json
 
@@ -190,3 +190,8 @@ Content-Type: application/json
   "lastName": "Admin",
   "role": "Administrator"
 }
+###
+GET {{host}}/api/countries/90/hotels?minRating=4.7
+Authorization: Bearer {{token}}
+
+###

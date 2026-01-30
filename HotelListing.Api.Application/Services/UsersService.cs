@@ -1,5 +1,4 @@
 ﻿using HotelListing.Api.Common.Constants;
-using HotelListing.Api.Common.Models;
 using HotelListing.Api.Common.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.Options;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using HotelListing.Api.Application.DTOs.Auth;
 using HotelListing.Api.Application.Contracts;
 using HotelListing.Api.Domain;
+using HotelListing.Api.Common.Models.Config;
 
 namespace HotelListing.Api.Application.Services;
 
