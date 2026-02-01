@@ -19,7 +19,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDataProtection();
 // Add services to the IoC container.
 var connectionString = builder.Configuration.GetConnectionString("HotelListingDbConnectionString");
-builder.Services.AddDbContext<HotelListingDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<HotelListingDbContext>(options =>
+{
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        sqlOptions.CommandTimeout(30);
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay : TimeSpan.FromSeconds(5),
+            errorNumbersToAdd : null
+        );
+    });
+
+    if(builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 .AddRoles<IdentityRole>()
@@ -70,7 +89,9 @@ builder.Services.AddAutoMapper(config => { }, typeof(HotelMappingProfile).Assemb
     config.AddProfile<HotelMappingProfile>();
     config.AddProfile<CountryMappingProfile>();
 });*/
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers()
+    .AddNewtonsoftJson()
+    .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });

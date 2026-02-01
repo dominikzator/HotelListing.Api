@@ -40,14 +40,19 @@ public class HotelsService(HotelListingDbContext context,
         {
             query = query.Where(p => p.PerNightRate <= filters.MaxPrice);
         }
+
         if (!string.IsNullOrWhiteSpace(filters.Location))
         {
-            query = query.Where(p => p.Address.Contains(filters.Location));
+            var location = filters.Location.Trim();
+            query = query.Where(h => EF.Functions.Like(h.Address, $"%{location}%"));
         }
 
-        if(!string.IsNullOrWhiteSpace(filters.Search))
+        // generic search param
+        if (!string.IsNullOrWhiteSpace(filters.Search))
         {
-            query = query.Where(p => p.Name.Contains(filters.Search) || p.Address.Contains(filters.Search));
+            var search = filters.Search.Trim();
+            query = query.Where(h => EF.Functions.Like(h.Name, $"%{search}%") ||
+                                    EF.Functions.Like(h.Address, $"%{search}%"));
         }
 
         query = filters.SortBy?.ToLower() switch
@@ -99,10 +104,7 @@ public class HotelsService(HotelListingDbContext context,
         context.Hotels.Add(hotel);
         await context.SaveChangesAsync();
 
-        var dto = await context.Hotels
-            .Where(h => h.Id == hotel.Id)
-            .ProjectTo<GetHotelDto>(mapper.ConfigurationProvider)
-            .FirstAsync();
+        var dto = mapper.Map<GetHotelDto>(hotel);
 
         return Result<GetHotelDto>.Success(dto);
     }

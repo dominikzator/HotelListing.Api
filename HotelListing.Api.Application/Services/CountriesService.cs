@@ -10,6 +10,7 @@ using HotelListing.Api.Application.DTOs.Hotel;
 using HotelListing.Api.Common.Models.Paging;
 using HotelListing.Api.Common.Models.Extensions;
 using HotelListing.Api.Common.Models.Filtering;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace HotelListing.Api.Application.Services;
 
@@ -27,6 +28,7 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper) : I
         }
 
         var countries = await query
+            .AsNoTracking()
             .ProjectTo<GetCountriesDto>(mapper.ConfigurationProvider)
             .ToListAsync();
 
@@ -36,6 +38,7 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper) : I
     public async Task<Result<GetCountryDto>> GetCountryAsync(int id)
     {
         var country = await context.Countries
+            .AsNoTracking()
             .Where(q => q.CountryId == id)
             .ProjectTo<GetCountryDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
@@ -122,12 +125,12 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper) : I
 
     public async Task<bool> CountryExistsAsync(int id)
     {
-        return await context.Countries.AnyAsync(e => e.CountryId == id);
+        return await context.Countries.AsNoTracking().AnyAsync(e => e.CountryId == id);
     }
 
     public async Task<bool> CountryExistsAsync(string name)
     {
-        return await context.Countries
+        return await context.Countries.AsNoTracking()
             .AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
     }
 
@@ -174,5 +177,39 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper) : I
         };
 
         return Result<GetCountryHotelsDto>.Success(result);
+    }
+
+    public async Task<Result> PatchCountryAsync(int id, JsonPatchDocument<UpdateCountryDto> patchDoc)
+    {
+        var country = await context.Countries.FindAsync(id);
+        if (country is null)
+        {
+            return Result.NotFound(new Error(ErrorCodes.NotFound, $"Country '{id}' was not found."));
+        }
+
+        var countryDto = mapper.Map<UpdateCountryDto>(country);
+        patchDoc.ApplyTo(countryDto);
+
+        if (countryDto.Id != id)
+        {
+            return Result.BadRequest(new Error(ErrorCodes.Validation, "Cannot modify the Id field."));
+        }
+
+        var normalizedName = countryDto.Name.ToLower().Trim();
+        var duplicateExists = await context.Countries
+                .AnyAsync(c => c.Name.ToLower().Trim() == normalizedName
+                    && c.CountryId != id);
+
+        if (duplicateExists)
+        {
+            return Result.Failure(new Error(ErrorCodes.Conflict,
+                $"Country with name '{countryDto.Name}' already exists."));
+        }
+
+        mapper.Map(countryDto, country);
+        context.Entry(country).State = EntityState.Modified;
+        await context.SaveChangesAsync();
+
+        return Result.Success();
     }
 }
