@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using HotelListing.Api.Common.Constants;
 using HotelListing.Api.Common.Results;
@@ -252,4 +252,4 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper, IMe
 
         return Result.Success();
     }
-}
+}*/
