@@ -1,6 +1,6 @@
 ### Variables
 @json = application/json
-@host=https://localhost:7275
+@host= https://localhost:7275
 @hotelId=7
 @bookingId=8
 @today={{$localDatetime iso8601}} 
