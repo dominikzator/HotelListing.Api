@@ -12,13 +12,15 @@ using HotelListing.Api.Application.DTOs.Auth;
 using HotelListing.Api.Application.Contracts;
 using HotelListing.Api.Domain;
 using HotelListing.Api.Common.Models.Config;
+using Microsoft.Extensions.Logging;
 
 namespace HotelListing.Api.Application.Services;
 
 public class UsersService(UserManager<ApplicationUser> userManager
     , IOptions<JwtSettings> jwtOptions
     , HotelListingDbContext hotelListingDbContext
-    , IHttpContextAccessor httpContextAccessor) : IUsersService
+    , IHttpContextAccessor httpContextAccessor
+    , ILogger<UsersService> logger) : IUsersService
 {
     public async Task<Result<RegisteredUserDto>> RegisterAsync(RegisterUserDto registerUserDto)
     {
@@ -34,6 +36,7 @@ public class UsersService(UserManager<ApplicationUser> userManager
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => new Error(ErrorCodes.BadRequest, e.Description)).ToArray();
+            logger.LogError("User registration failed for {Email}: {Errors}", registerUserDto.Email, string.Join(",", errors));
 
             return Result<RegisteredUserDto>.BadRequest(errors);
         }
@@ -67,6 +70,7 @@ public class UsersService(UserManager<ApplicationUser> userManager
         var user = await userManager.FindByEmailAsync(dto.Email);
         if (user is null)
         {
+            logger.LogWarning("Failed login attempt for email: {Email}", dto.Email);
             return Result<string>.Failure(new Error(ErrorCodes.BadRequest, "Invalid credentials."));
         }
 
