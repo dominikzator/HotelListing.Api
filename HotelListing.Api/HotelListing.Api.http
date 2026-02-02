@@ -52,9 +52,10 @@ Content-Type: application/json-patch+json
 ###
 
 GET {{HotelListing.Api_HostAddress}}/api/countries
+#Accept: application/json
 #X-Api-Key: dXNlckBleGFtcGxlLmNvbTpQYSQkdzByZDEyMzQ=
 #Authorization: Basic dXNlckBleGFtcGxlLmNvbTpQYSQkdzByZDEyMzQ=
-Authorization: Bearer {{token}}
+#Authorization: Bearer {{token}}
 ###
 
 DELETE {{HotelListing.Api_HostAddress}}/api/countries/2

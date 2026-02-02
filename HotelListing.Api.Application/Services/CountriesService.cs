@@ -1,82 +1,47 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotelListing.Api.Common.Constants;
-using HotelListing.Api.Common.Results;
-using Microsoft.EntityFrameworkCore;
-using HotelListing.Api.Application.DTOs.Country;
 using HotelListing.Api.Application.Contracts;
-using HotelListing.Api.Domain;
+using HotelListing.Api.Application.DTOs.Country;
 using HotelListing.Api.Application.DTOs.Hotel;
-using HotelListing.Api.Common.Models.Paging;
+using HotelListing.Api.Common.Constants;
 using HotelListing.Api.Common.Models.Extensions;
 using HotelListing.Api.Common.Models.Filtering;
+using HotelListing.Api.Common.Models.Paging;
+using HotelListing.Api.Common.Results;
+using HotelListing.Api.Domain;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.Extensions.Caching.Memory;
-using System.Diagnostics.Metrics;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Application.Services;
 
-public class CountriesService(HotelListingDbContext context, IMapper mapper, IMemoryCache cache) : ICountriesService
+public class CountriesService(HotelListingDbContext context, IMapper mapper) : ICountriesService
 {
-    private const string CountryListCacheName = "countries_list_";
-    private const string CountrySingleCacheName = "country_";
-
-    public async Task<Result<IEnumerable<GetCountriesDto>>> GetCountriesAsync(CountryFilterParameters filters)
+    public async Task<Result<IEnumerable<GetCountriesDto>>> GetCountriesAsync(CountryFilterParameters? filters)
     {
-        var searchTerm = filters?.Search?.Trim().ToLowerInvariant() ?? string.Empty;
-        var cacheKey = $"{CountryListCacheName}{searchTerm}";
+        var query = context.Countries.AsQueryable();
 
-        if(!cache.TryGetValue(cacheKey, out IEnumerable<GetCountriesDto>? countries))
+        if (!string.IsNullOrWhiteSpace(filters?.Search))
         {
-            var query = context.Countries.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(filters.Search))
-            {
-                var term = filters.Search.Trim();
-                query = query.Where(c => EF.Functions.Like(c.Name, $"%{term}%")
-                || EF.Functions.Like(c.ShortName, $"%{term}%"));
-            }
-
-            countries = await query
-                .AsNoTracking()
-                .ProjectTo<GetCountriesDto>(mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            var cacheOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromMinutes(5))
-            .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
-
-            cache.Set(cacheKey, countries, cacheOptions);
+            var term = filters.Search.Trim();
+            query = query.Where(c => EF.Functions.Like(c.Name, $"%{term}%")
+            || EF.Functions.Like(c.ShortName, $"%{term}%"));
         }
-        countries ??= [];
+
+        var countries = await query
+            .AsNoTracking()
+            .ProjectTo<GetCountriesDto>(mapper.ConfigurationProvider)
+            .ToListAsync();
 
         return Result<IEnumerable<GetCountriesDto>>.Success(countries);
     }
 
     public async Task<Result<GetCountryDto>> GetCountryAsync(int id)
     {
-        // Check the cache
-        var cacheKey = $"{CountrySingleCacheName}{id}";
-        if(!cache.TryGetValue(cacheKey, out GetCountryDto? country))
-        {
-            country = await context.Countries
-                .AsNoTracking()
-                .Where(q => q.CountryId == id)
-                .ProjectTo<GetCountryDto>(mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync();
-
-            if(country is not null)
-            {
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(5))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                cache.Set(cacheKey, country, cacheOptions);
-            }
-        }
-
-        // if not found in the cache, then hit the database
-
+        var country = await context.Countries
+            .AsNoTracking()
+            .Where(q => q.CountryId == id)
+            .ProjectTo<GetCountryDto>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
 
         return country is null
             ? Result<GetCountryDto>.Failure(new Error(ErrorCodes.NotFound, $"Country '{id}' was not found."))
@@ -97,9 +62,7 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper, IMe
             context.Countries.Add(country);
             await context.SaveChangesAsync();
 
-            var dto = mapper.Map<GetCountryDto>(createDto);
-
-            cache.Remove($"{CountryListCacheName}");
+            var dto = mapper.Map<GetCountryDto>(country);
 
             return Result<GetCountryDto>.Success(dto);
         }
@@ -148,7 +111,6 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper, IMe
 
             context.Countries.Remove(country);
             await context.SaveChangesAsync();
-            InvalidateCountryCache(id);
 
             return Result.Success();
         }
@@ -158,19 +120,17 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper, IMe
         }
     }
 
-    private void InvalidateCountryCache(int id)
-    {
-        cache.Remove($"{CountrySingleCacheName}{id}");
-    }
-
     public async Task<bool> CountryExistsAsync(int id)
     {
-        return await context.Countries.AsNoTracking().AnyAsync(e => e.CountryId == id);
+        return await context.Countries
+            .AsNoTracking()
+            .AnyAsync(e => e.CountryId == id);
     }
 
     public async Task<bool> CountryExistsAsync(string name)
     {
-        return await context.Countries.AsNoTracking()
+        return await context.Countries
+            .AsNoTracking()
             .AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
     }
 
@@ -201,7 +161,7 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper, IMe
         hotelsQuery = (filters.SortBy?.Trim().ToLowerInvariant()) switch
         {
             "name" => (bool)filters.SortDescending! ? hotelsQuery.OrderByDescending(h => h.Name) : hotelsQuery.OrderBy(h => h.Name),
-            "rating" => (bool)filters.SortDescending! ? hotelsQuery.OrderByDescending(h => h.Rating) : hotelsQuery.OrderBy(h => h.Rating),
+            "rating" => !(bool)filters.SortDescending! ? hotelsQuery.OrderBy(h => h.Rating) : hotelsQuery.OrderByDescending(h => h.Rating),
             _ => hotelsQuery.OrderBy(h => h.Name)
         };
 
